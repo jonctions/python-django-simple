@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  app:
+    build: .
+
+    networks:
+      - default
+    ports:
+      - "8000:8000"
+    environment:
+      - LIFE_QUOTE=Even the tallest and most formidable of towers was once just a pile of bricks.
+      - AUTHOR=Mokgadi Rasekgala
+    env_file:
+      - ./.envs/.local
+    volumes:
+      - .:/code
+    command: /code/start.sh
+
+
+
