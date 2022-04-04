@@ -19,8 +19,8 @@ stages:
 
 variables:
 #  POSTGRES_DB: database_name
-  PLAYWD: ip172-18-0-7-bv3r0k2g770000f0cppg
-  PLAYWD_PRD: ip172-18-0-96-bv3r0k2g770000f0cppg
+  PLAYWD: ip172-18-0-82-c95kvh433d5g00dmm830
+  PLAYWD_PRD: ip172-18-0-96-c95kvh433d5g00dmm830
   DOCKER_HOST: tcp://docker:2375
   AUTHOR: "Guillaume Rémy"
 
