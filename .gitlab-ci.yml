@@ -61,7 +61,7 @@ default:
 
 stages:
   - test
- # - quality
+  - package
 
 django-tests:
   stage: test
@@ -89,3 +89,15 @@ django-tests:
  # artifacts:
  #   paths:
  #     - codequality-results/
+
+ package_job:
+  stage: package
+  services:
+    - docker:stable-dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  script:
+    - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = [‘$PLAYWD-8080.direct.labs.play-with-docker.com’, '$PLAYWD_PRD-8080.direct.labs.play-with-docker.com']/" config/settings.py
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  image: docker:stable
