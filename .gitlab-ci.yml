@@ -33,6 +33,7 @@ variables:
   LIFE_QUOTE: "Life is good"
   PURPOSE: "Bla bla"
   PLAYWD: "ip172-18-0-81-cf9tg2791rrg00dejjrg"
+  PLAYWD_PRD: "ip172-18-0-74-cf9tg2791rrg00dejjrg" 
   # DJANGO_CONFIG: "test"
   #MYSQL_DATABASE: $MYSQL_DB
   #MYSQL_ROOT_PASSWORD: $MYSQL_PASS
@@ -134,9 +135,23 @@ performance_job:
     - mkdir gitlab-exporter
     - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
     - mkdir sitespeed-results
-    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
+    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:26.1.0 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
   artifacts:
     paths:
       - sitespeed-results/
     reports:
       performance: sitespeed-results/data/performance.json
+
+deploy_production_job:
+  stage: deploy
+  image: docker:stable
+  when: manual
+  before_script:
+    - export DOCKER_HOST=tcp://$PLAYWD_PRD.direct.labs.play-with-docker.com:2375
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+  script:
+    - docker run --name python-django -d -p 8080:8000 -e PLAYWD="$PLAYWD_PRD" -e PURPOSE="A simple Django app" -e LIFE_QUOTE="Even the tallest and most formidable of towers was once just a pile of bricks." $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  environment:
+    name: production
+    url: http://$PLAYWD_PRD-8080.direct.labs.play-with-docker.com/admin
