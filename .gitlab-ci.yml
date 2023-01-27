@@ -70,6 +70,7 @@ django-tests:
     #- echo "GRANT ALL on *.* to '${MYSQL_USER}';"| mysql -u root --password="${MYSQL_ROOT_PASSWORD}" -h mysql
     # use python3 explicitly. see https://wiki.ubuntu.com/Python/3
     - python3 manage.py test
+   
 
 #code_quality_job:
 #  stage: quality
@@ -90,7 +91,7 @@ django-tests:
  #   paths:
  #     - codequality-results/
 
- package_job:
+package_job:
   stage: package
   services:
     - docker:stable-dind
