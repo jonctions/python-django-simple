@@ -82,7 +82,7 @@ django-tests:
 #  script:
 ##    - docker run
  #       --env CODECLIMATE_CODE="/code"
- ##      --volume "$PWD":/code
+ #      --volume "$PWD":/code
  #       --volume /var/run/docker.sock:/var/run/docker.sock
  #       --volume /tmp/cc:/tmp/cc
  #       codeclimate/codeclimate analyze -f html > ./codequality-results/index.html
