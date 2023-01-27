@@ -126,6 +126,8 @@ performance_job:
     URL: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
   services:
     - docker:stable-dind
+  before_script:
+    - echo "true"
   script:
     - apk add --no-cache curl
     - x=1; while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $URL)" != "200" && "$(curl -s -o /dev/null -w ''%{http_code}'' $URL)" != "301" && $x -le 60 ]]; do sleep 5; echo $(( x++ )); done || false
@@ -133,9 +135,8 @@ performance_job:
     - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
     - mkdir sitespeed-results
     - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
-    - mv sitespeed-results/data/performance.json performance.json
   artifacts:
     paths:
       - sitespeed-results/
     reports:
-      performance: performance.json
+      performance: sitespeed-results/data/performance.json
