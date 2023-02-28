@@ -82,6 +82,7 @@ code_quality_job:
   before_script:
     - mkdir codequality-results
   script:
+    - echo $PWD
     - docker run
         --env CODECLIMATE_CODE="/code"
         --volume "$PWD":/code
