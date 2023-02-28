@@ -62,7 +62,7 @@ default:
 stages:
   - test
   - quality
-  - build
+  - package
   - deploy
 
 django-tests:
