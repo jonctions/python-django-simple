@@ -58,15 +58,9 @@ default:
     - apt -y upgrade
     - pip3 install -r requirements.txt
 
-
-migrations:
-  stage: build
-  script:
-    - python3 manage.py makemigrations
-    # - python3 manage.py makemigrations myapp
-    - python3 manage.py migrate
-    - python3 manage.py check
-
+stages:
+  - test
+  - quality
 
 django-tests:
   stage: test
@@ -76,7 +70,22 @@ django-tests:
     # use python3 explicitly. see https://wiki.ubuntu.com/Python/3
     - python3 manage.py test
 
-deploy:
-  stage: deploy
-  script: echo "Define your deployment script!"
-  environment: production
+code_quality_job:
+  stage: quality
+  image: docker:stable
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  before_script:
+    - mkdir codequality-results
+  script:
+    - docker run
+        --env CODECLIMATE_CODE="/code"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        --volume /tmp/cc:/tmp/cc
+        codeclimate/codeclimate analyze -f html > ./codequality-results/index.html
+  artifacts:
+    paths:
+      - codequality-results/
+
