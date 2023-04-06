@@ -29,9 +29,10 @@
 # .gitlab-ci.yml are passed to the service and variables defined in the GitLab UI are not.
 # https://gitlab.com/gitlab-org/gitlab/-/issues/30178
 
-#variables:
-#  # DJANGO_CONFIG: "test"
-#  MYSQL_DATABASE: $MYSQL_DB
+variables:
+  # DJANGO_CONFIG: "test"
+  LIFE_QUOTE: "Life is good"
+  PURPOSE: "My purpose"
 #  MYSQL_ROOT_PASSWORD: $MYSQL_PASS
 #  MYSQL_USER: $MYSQL_USER
 #  MYSQL_PASSWORD: $MYSQL_PASS
