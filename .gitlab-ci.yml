@@ -63,6 +63,7 @@ stages:
   - test
   - quality
   - package
+  - deploy
 
 django-tests:
   stage: test
