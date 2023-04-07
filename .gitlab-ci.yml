@@ -33,6 +33,7 @@ variables:
   # DJANGO_CONFIG: "test"
   LIFE_QUOTE: "Life is good"
   PURPOSE: "My purpose"
+  PLAYWD: ip172-18-0-97-cgnslro1k7jg0093ib00
 #  MYSQL_ROOT_PASSWORD: $MYSQL_PASS
 #  MYSQL_USER: $MYSQL_USER
 #  MYSQL_PASSWORD: $MYSQL_PASS
@@ -101,3 +102,16 @@ package_job:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   image: docker:stable
+
+deploy_staging_job:
+  stage: deploy
+  image: docker:stable
+  before_script:
+    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+  script:
+    - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  environment:
+    name: staging
+    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
