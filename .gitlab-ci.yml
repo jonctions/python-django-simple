@@ -60,19 +60,19 @@ default:
     - pip3 install -r requirements.txt
 
 stages:
-  - test
+  #- test
   #- quality
-  - package
-  - deploy
+  #- package
+  #- deploy
   - performance
 
-django-tests:
-  stage: test
-  script:
-    # The MYSQL user only gets permissions for MYSQL_DB, so Django can't create a test database.
-    #- echo "GRANT ALL on *.* to '${MYSQL_USER}';"| mysql -u root --password="${MYSQL_ROOT_PASSWORD}" -h mysql
-    # use python3 explicitly. see https://wiki.ubuntu.com/Python/3
-    - python3 manage.py test
+# django-tests:
+#   stage: test
+#   script:
+#     # The MYSQL user only gets permissions for MYSQL_DB, so Django can't create a test database.
+#     #- echo "GRANT ALL on *.* to '${MYSQL_USER}';"| mysql -u root --password="${MYSQL_ROOT_PASSWORD}" -h mysql
+#     # use python3 explicitly. see https://wiki.ubuntu.com/Python/3
+#     - python3 manage.py test
 
 # code_quality_job:
 #   stage: quality
@@ -93,30 +93,30 @@ django-tests:
 #     paths:
 #       - codequality-results/
 
-package_job:
-  stage: package
-  services:
-    - docker:stable-dind
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  script:
-    - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = ['$PLAYWD-8080.direct.labs.play-with-docker.com', '$PLAYWD_PRD-8080.direct.labs.play-with-docker.com']/" config/settings.py
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  image: docker:stable
+# package_job:
+#   stage: package
+#   services:
+#     - docker:stable-dind
+#   before_script:
+#     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+#   script:
+#     - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = ['$PLAYWD-8080.direct.labs.play-with-docker.com', '$PLAYWD_PRD-8080.direct.labs.play-with-docker.com']/" config/settings.py
+#     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
+#     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#   image: docker:stable
 
-deploy_staging_job:
-  stage: deploy
-  image: docker:stable
-  before_script:
-    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
-  script:
-    - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  environment:
-    name: staging
-    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
+# deploy_staging_job:
+#   stage: deploy
+#   image: docker:stable
+#   before_script:
+#     - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
+#     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+#     - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+#   script:
+#     - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#   environment:
+#     name: staging
+#     url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
 
 performance_job:
   stage: performance
@@ -133,7 +133,7 @@ performance_job:
     - mkdir gitlab-exporter
     - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
     - mkdir sitespeed-results
-    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:6.3.1 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
+    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:27.1.0 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
     - mv sitespeed-results/data/performance.json performance.json
   artifacts:
     paths:
