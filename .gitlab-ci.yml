@@ -133,7 +133,7 @@ performance_job:
     - mkdir gitlab-exporter
     - wget -O ./gitlab-exporter/index.js https://gitlab.com/gitlab-org/gl-performance/raw/master/index.js
     - mkdir sitespeed-results
-    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:27.1.0 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
+    - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:26.1.0 --plugins.add ./gitlab-exporter --outputFolder sitespeed-results $URL
     - mv sitespeed-results/data/performance.json performance.json
   artifacts:
     paths:
