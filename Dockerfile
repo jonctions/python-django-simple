@@ -23,7 +23,7 @@ COPY . /code/
 #set environments to be used
 ENV AUTHOR="Mokgadi"
 
-EXPOSE 8000
+EXPOSE 8080
 
 #run the service docker app
 CMD /code/start.sh
