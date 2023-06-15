@@ -33,8 +33,8 @@ variables:
   # DJANGO_CONFIG: "test"
   LIFE_QUOTE: "Life is good"
   PURPOSE: "My purpose"
-  PLAYWD: ip172-18-0-97-cgnslro1k7jg0093ib00
-  PLAYWD_PRD: ip172-18-0-26-cgnslro1k7jg0093ib00
+  PLAYWD: ip172-18-0-24-ci5nauksnmng00amuj90
+  PLAYWD_PRD: ip172-18-0-23-ci5nauksnmng00amuj90
 #  MYSQL_ROOT_PASSWORD: $MYSQL_PASS
 #  MYSQL_USER: $MYSQL_USER
 #  MYSQL_PASSWORD: $MYSQL_PASS
@@ -75,24 +75,24 @@ django-tests:
     # use python3 explicitly. see https://wiki.ubuntu.com/Python/3
     - python3 manage.py test
 
-# code_quality_job:
-#   stage: quality
-#   image: docker:stable
-#   allow_failure: true
-#   services:
-#     - docker:stable-dind
-#   before_script:
-#     - mkdir codequality-results
-#   script:
-#     - docker run
-#         --env CODECLIMATE_CODE="/code"
-#         --volume "$PWD":/code
-#         --volume /var/run/docker.sock:/var/run/docker.sock
-#         --volume /tmp/cc:/tmp/cc
-#         codeclimate/codeclimate analyze -f html > ./codequality-results/index.html
-#   artifacts:
-#     paths:
-#       - codequality-results/
+code_quality_job:
+  stage: quality
+  image: docker:stable
+  allow_failure: true
+  services:
+    - docker:stable-dind
+  before_script:
+    - mkdir codequality-results
+  script:
+    - docker run
+        --env CODECLIMATE_CODE="/code"
+        --volume "$PWD":/code
+        --volume /var/run/docker.sock:/var/run/docker.sock
+        --volume /tmp/cc:/tmp/cc
+        codeclimate/codeclimate analyze -f html > ./codequality-results/index.html
+  artifacts:
+    paths:
+      - codequality-results/
 
 package_job:
   stage: package
