@@ -62,7 +62,7 @@ default:
 
 stages:
   - test
-  #- quality
+  - quality
   - package
   - deploy
   - performance
