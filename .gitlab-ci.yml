@@ -135,4 +135,4 @@ performance_job:
     - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:26.1.0 --outputFolder sitespeed-results $URL
   artifacts:
     paths:
-      - sitespeed-results/
+      - sitespeed-results/**
