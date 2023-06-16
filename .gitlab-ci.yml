@@ -111,9 +111,9 @@ deploy_staging_job:
   before_script:
     - export DOCKER_HOST=tcp://proxmox.qualibre-formations.fr:2375
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+    - if docker rm -f python-django-guillaume-remy ; then echo "Existing application stopped"; fi
   script:
-    - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker run --name python-django-guillaume-remy -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   environment:
     name: staging
     url: http://proxmox.qualibre-formations.fr:8080/admin
