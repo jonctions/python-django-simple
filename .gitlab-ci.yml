@@ -100,7 +100,7 @@ package_job:
   before_script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = ['$PLAYWD-8080.direct.labs.play-with-docker.com', '$PLAYWD_PRD-8080.direct.labs.play-with-docker.com']/" config/settings.py
+    - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = ['proxmox.qualibre-formations.fr']/" config/settings.py
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   image: docker:stable
@@ -109,11 +109,11 @@ deploy_staging_job:
   stage: deploy
   image: docker:stable
   before_script:
-    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
+    - export DOCKER_HOST=tcp://proxmox.qualibre-formations.fr:2375
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - if docker rm -f python-django ; then echo "Existing application stopped"; fi
   script:
     - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   environment:
     name: staging
-    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
+    url: http://proxmox.qualibre-formations.fr:8080/admin
