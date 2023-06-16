@@ -133,7 +133,7 @@ performance_job:
     - x=1; while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $URL)" != "200" && "$(curl -s -o /dev/null -w ''%{http_code}'' $URL)" != "301" && $x -le 60 ]]; do sleep 5; echo $(( x++ )); done || false
     - mkdir sitespeed-results
     - docker run --shm-size=1g --rm -v "$(pwd)":/sitespeed.io sitespeedio/sitespeed.io:26.1.0 --outputFolder sitespeed-results $URL
-    - ls -lR sitespeed-results
+    - ls -lR .
   artifacts:
     paths:
       - sitespeed-results/
