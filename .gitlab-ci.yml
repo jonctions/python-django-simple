@@ -32,6 +32,7 @@
 variables:
   LIFE_QUOTE: "Life is good"
   PURPOSE: "Simple Django app"
+  PLAYWD: "ip172-18-0-80-cjk7ap8gftqg009ld6c0"
   # DJANGO_CONFIG: "test"
 #  MYSQL_DATABASE: $MYSQL_DB
 #  MYSQL_ROOT_PASSWORD: $MYSQL_PASS
@@ -73,11 +74,6 @@ django-tests:
     # use python3 explicitly. see https://wiki.ubuntu.com/Python/3
     - python3 manage.py test
 
-deploy:
-  stage: deploy
-  script: echo "Define your deployment script!"
-  environment: production
-
 #code_quality_job:
 #  stage: quality
 #  image: docker:stable
@@ -109,3 +105,17 @@ package_job:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   image: docker:stable
+
+deploy_staging_job:
+  stage: deploy
+  image: docker:stable
+  before_script:
+    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+  script:
+    - docker run --name python-django -d -p 8080:8000 -e PURPOSE="A simple Django app" -e LIFE_QUOTE="Even the tallest and most formidable of towers was
+        once just a pile of bricks." $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  environment:
+    name: staging
+    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
