@@ -61,7 +61,8 @@ default:
 
 stages:
   - test
-  - quality
+#  - quality
+  - package
   - deploy
 
 django-tests:
@@ -77,21 +78,34 @@ deploy:
   script: echo "Define your deployment script!"
   environment: production
 
-code_quality_job:
-  stage: quality
-  image: docker:stable
-  allow_failure: true
+#code_quality_job:
+#  stage: quality
+#  image: docker:stable
+#  allow_failure: true
+#  services:
+#    - docker:stable-dind
+#  before_script:
+#    - mkdir codequality-results
+#  script:
+#    - docker run
+#      --env CODECLIMATE_CODE="/code"
+#      --volume "$PWD":/code
+#      --volume /var/run/docker.sock:/var/run/docker.sock
+#      --volume /tmp/cc:/tmp/cc
+#      codeclimate/codeclimate:0.94.1 analyze -f html > ./codequality-results/index.html
+#  artifacts:
+#    paths:
+#      - codequality-results/
+
+package_job:
+  stage: package
   services:
     - docker:stable-dind
   before_script:
-    - mkdir codequality-results
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker run
-      --env CODECLIMATE_CODE="/code"
-      --volume "$PWD":/code
-      --volume /var/run/docker.sock:/var/run/docker.sock
-      --volume /tmp/cc:/tmp/cc
-      codeclimate/codeclimate:0.94.1 analyze -f html > ./codequality-results/index.html
-  artifacts:
-    paths:
-      - codequality-results/
+    - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = ['$PLAYWD-8080.direct.labs.play-with-docker.com',
+      '$PLAYWD_PRD-8080.direct.labs.play-with-docker.com']/" config/settings.py
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --build-arg AUTHOR="$AUTHOR" .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  image: docker:stable
