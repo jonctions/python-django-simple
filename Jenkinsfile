@@ -33,11 +33,10 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-            tools {
-                SonarScanner
-            }
-            withSonarQubeEnv() {
-            sh "${scannerHome}/bin/sonar-scanner"
+            steps {
+                withSonarQubeEnv('SonarServer') {
+                    sh "sonar-scanner"
+                }
             }
         }
         stage('Publish') {
