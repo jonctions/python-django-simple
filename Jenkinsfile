@@ -20,6 +20,17 @@ pipeline {
                     url: 'https://gitlab.com/qualibre-info-formations/public/python-django-simple.git'
             }
         }
+        stage('Unit tests') {
+            agent {
+                docker {
+                    image 'python:3.6'
+                    label 'machine2'
+                }
+            }
+            steps {
+                sh 'python manage.py test'
+            }
+        }
         stage('Build') {
             environment {
                  COMMIT_SHA = """${sh(
