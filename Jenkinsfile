@@ -24,7 +24,6 @@ pipeline {
             agent {
                 docker {
                     image 'python:3.6'
-                    label 'machine2'
                 }
             }
             steps {
