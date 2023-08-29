@@ -32,6 +32,12 @@ pipeline {
                 sh 'docker build -t $HARBOR_URL/library/django-simple-app:$COMMIT_SHA .'
             }
         }
+        stage('SonarQube Analysis') {
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv() {
+            sh "${scannerHome}/bin/sonar-scanner"
+            }
+        }
         stage('Publish') {
             environment {
                  COMMIT_SHA = """${sh(
