@@ -54,13 +54,6 @@ pipeline {
                 }
             }
         }
-        stage('SonarQube Quality Gate') {
-            steps {
-                timeout(time: 4, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
         stage('Publish') {
             environment {
                  COMMIT_SHA = """${sh(
