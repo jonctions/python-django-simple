@@ -66,19 +66,6 @@ pipeline {
                 sh 'docker push $HARBOR_URL/library/django-simple-app:$COMMIT_SHA'
             }
         }
-        stage('Deploy') {
-            environment {
-                 COMMIT_SHA = """${sh(
-                    returnStdout: true,
-                    script: "git log -n 1 --pretty=format:'%H'"
-                )}"""
-            }
-            steps {
-                // Deploy your Django application
-                sh 'docker rm -f django-sample-app || true'
-                sh 'docker run --name django-sample-app -d -p 8000:8000 -it -e AUTHOR -e PURPOSE -e LIFE_QUOTE $HARBOR_URL/library/django-simple-app:$COMMIT_SHA'
-            }
-        }
     }
     post {
         success {
