@@ -81,15 +81,12 @@ pipeline {
         }
     }
     post {
-        environment {
-                COMMIT_SHA = """${sh(
-                returnStdout: true,
-                script: "git log -n 1 --pretty=format:'%H'"
-            )}"""
-        }
         success {
             build job: 'python django CD', parameters: [
-                    textParam(name: 'COMMIT_SHA', value: $COMMIT_SHA)
+                    textParam(name: 'COMMIT_SHA', value: """${sh(
+                returnStdout: true,
+                script: "git log -n 1 --pretty=format:'%H'"
+            )}""")
                 ]
         }
     }
