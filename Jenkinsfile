@@ -4,6 +4,7 @@ pipeline {
     }
     options {
         ansiColor('xterm')
+        gitLabConnection('GitLab')
     }
     environment {
         AUTHOR = 'Guillaume Rémy'
@@ -28,8 +29,17 @@ pipeline {
                 }
             }
             steps {
+                updateGitlabCommitStatus name: 'unit tests', state: 'running'
                 sh 'pip install -r requirements.txt'
                 sh 'python manage.py test'
+            }
+            post {
+                success {
+                    updateGitlabCommitStatus name: 'unit tests', state: 'success'
+                }
+                failure {
+                    updateGitlabCommitStatus name: 'unit tests', state: 'failure'
+                }
             }
         }
         stage('Build') {
