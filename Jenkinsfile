@@ -38,7 +38,7 @@ pipeline {
                     updateGitlabCommitStatus name: 'unit tests', state: 'success'
                 }
                 failure {
-                    updateGitlabCommitStatus name: 'unit tests', state: 'failure'
+                    updateGitlabCommitStatus name: 'unit tests', state: 'failed'
                 }
             }
         }
