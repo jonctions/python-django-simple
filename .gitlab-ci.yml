@@ -1,4 +1,5 @@
 variables:
+  PLAYWD: "ip172-18-0-6-clboh9csnmng00aue27g"
   LIFE_QUOTE: "Life is good"
   PURPOSE: "Simple Django app"
   AUTHOR: "John Doe"
@@ -18,6 +19,7 @@ default:
 stages:
   - test
   - package
+  - deploy
 
 django-tests:
   stage: test
@@ -35,3 +37,16 @@ package_job:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
   image: docker:stable
+
+deploy_staging_job:
+  stage: deploy
+  image: docker:stable
+  before_script:
+    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+  script:
+    - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE -e AUTHOR $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  environment:
+    name: staging
+    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
