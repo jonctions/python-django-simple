@@ -17,31 +17,12 @@ default:
 
 stages:
   - test
-  - quality
+  - package
 
 django-tests:
   stage: test
   script:
     - python3 manage.py test
-    
-code_quality_job:
-  stage: quality
-  image: docker:stable
-  allow_failure: true
-  services:
-    - docker:stable-dind
-  before_script:
-    - mkdir codequality-results
-  script:
-    - docker run
-        --env CODECLIMATE_CODE="/code"
-        --volume "$PWD":/code
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        --volume /tmp/cc:/tmp/cc
-        codeclimate/codeclimate:0.94.1 analyze -f html > ./codequality-results/index.html
-  artifacts:
-    paths:
-      - codequality-results/
       
 package_job:
   stage: package
