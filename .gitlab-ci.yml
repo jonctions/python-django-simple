@@ -59,7 +59,7 @@ package_job:
 
 deploy_staging_job:
   stage: deploy
-  image: docker:stable
+  image: docker:24
   before_script:
     - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
