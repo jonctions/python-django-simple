@@ -1,5 +1,4 @@
 variables:
-  PLAYWD: "ip172-18-0-6-clboh9csnmng00aue27g"
   LIFE_QUOTE: "Life is good"
   PURPOSE: "Simple Django app"
   AUTHOR: "John Doe"
@@ -18,57 +17,8 @@ default:
 
 stages:
   - test
-  - quality
-  - package
-  - deploy
-
-code_quality_job:
-  stage: quality
-  image: docker:20
-  allow_failure: true
-  tags:
-    - gitlab-org-docker
-  services:
-    - docker:20-dind
-  before_script:
-    - mkdir codequality-results
-  script:
-    - docker run
-        --env CODECLIMATE_CODE="/code"
-        --volume "$PWD":/code
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        --volume /tmp/cc:/tmp/cc
-        codeclimate/codeclimate:0.94.1 analyze -f html > ./codequality-results/index.html
-  artifacts:
-    paths:
-      - codequality-results/
 
 django-tests:
   stage: test
   script:
     - python3 manage.py test
-      
-package_job:
-  stage: package
-  services:
-    - docker:stable-dind
-  before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  script:
-    - sed -i "s/^ALLOWED_HOSTS = \[.*/ALLOWED_HOSTS = ['$PLAYWD-8080.direct.labs.play-with-docker.com', '$PLAYWD_PRD-8080.direct.labs.play-with-docker.com']/" config/settings.py
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  image: docker:stable
-
-deploy_staging_job:
-  stage: deploy
-  image: docker:stable
-  before_script:
-    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
-  script:
-    - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE -e AUTHOR $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  environment:
-    name: staging
-    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
