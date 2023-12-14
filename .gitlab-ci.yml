@@ -39,6 +39,7 @@ variables:
   LIFE_QUOTE: "Life is good"
   PURPOSE: "A simple Django app"
   PLAYWD: "ip172-18-0-46-cltggj6fml8g00b3jci0"
+  PLAYWD_PRD: "ip172-18-0-72-cltggj6fml8g00b3jci0"
 
 default:
   image: ubuntu:20.04
@@ -146,3 +147,17 @@ performance_job:
       - sitespeed-results/
   tags:
     - gitlab-org-docker
+
+deploy_production_job:
+  stage: deploy
+  image: docker:stable
+  when: manual
+  before_script:
+    - export DOCKER_HOST=tcp://$PLAYWD_PRD.direct.labs.play-with-docker.com:2375
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+  script:
+    - docker run --name python-django -d -p 8080:8000 -e PLAYWD="$PLAYWD_PRD" -e PURPOSE -e LIFE_QUOTE -e AUTHOR $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  environment:
+    name: production
+    url: http://$PLAYWD_PRD-8080.direct.labs.play-with-docker.com/admin
