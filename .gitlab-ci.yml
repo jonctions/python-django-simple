@@ -36,6 +36,8 @@ variables:
   MYSQL_ROOT_PASSWORD: $MYSQL_PASS
   MYSQL_USER: "django"
   MYSQL_PASSWORD: $MYSQL_PASS
+  LIFE_QUOTE: "Life is good"
+  PURPOSE: "A simple Django app"
 
 default:
   image: ubuntu:20.04
