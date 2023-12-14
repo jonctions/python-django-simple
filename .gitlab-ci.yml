@@ -31,9 +31,10 @@
 
 variables:
   # DJANGO_CONFIG: "test"
+  MYSQL_DB: "db-django"
   MYSQL_DATABASE: $MYSQL_DB
   MYSQL_ROOT_PASSWORD: $MYSQL_PASS
-  MYSQL_USER: $MYSQL_USER
+  MYSQL_USER: "django"
   MYSQL_PASSWORD: $MYSQL_PASS
 
 default:
