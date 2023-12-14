@@ -38,6 +38,7 @@ variables:
   MYSQL_PASSWORD: $MYSQL_PASS
   LIFE_QUOTE: "Life is good"
   PURPOSE: "A simple Django app"
+  PLAYWD: "ip172-18-0-46-cltggj6fml8g00b3jci0"
 
 default:
   image: ubuntu:20.04
