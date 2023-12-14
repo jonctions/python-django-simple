@@ -73,6 +73,7 @@ stages:
   - test
   - quality
   - package
+  - deploy
 
 code_quality_job:
   stage: quality
@@ -108,3 +109,16 @@ package_job:
   image: docker:20
   tags:
     - gitlab-org-docker
+
+deploy_staging_job:
+  stage: deploy
+  image: docker:24
+  before_script:
+    - export DOCKER_HOST=tcp://$PLAYWD.direct.labs.play-with-docker.com:2375
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - if docker rm -f python-django ; then echo "Existing application stopped"; fi
+  script:
+    - docker run --name python-django -d -p 8080:8000 -e PURPOSE -e LIFE_QUOTE -e AUTHOR $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  environment:
+    name: staging
+    url: http://$PLAYWD-8080.direct.labs.play-with-docker.com/admin
