@@ -25,7 +25,7 @@ SECRET_KEY = '=)rk4)5pm17e(dcdm=%64&p@ed$sr_&j1qz!#r0+!(b16%(3r2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ ".qualibre-formations.fr" ]
+ALLOWED_HOSTS = [ "localhost", ".jonctions.com" ]
 
 
 # Application definition
